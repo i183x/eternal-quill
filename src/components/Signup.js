@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom"; // Import Link
+import { useNavigate, Link } from "react-router-dom";
+import "./styles/LoginSignup.css"; // Assuming a shared style file for Login and Signup
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -10,16 +11,25 @@ const Signup = () => {
   const [age, setAge] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+    setError("");
+
+    if (!username || !email || !age || !password || !confirmPassword) {
+      setError("Please fill in all fields.");
       return;
     }
 
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -29,20 +39,22 @@ const Signup = () => {
         username,
         email,
         age,
-        createdAt: new Date(), // Store the account creation date
-        lastLoginAt: new Date(), // Initialize last login time as the creation time
+        createdAt: new Date(),
+        lastLoginAt: new Date(),
       });
 
       navigate("/"); // Redirect to the Feed/Home page after signup
     } catch (error) {
-      console.error("Error signing up:", error.message);
-      setError(error.message);
+      setError("Error signing up: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h2>Sign Up</h2>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleSignup}>
         <input
           type="text"
@@ -81,13 +93,14 @@ const Signup = () => {
         />
         <label>
           <input type="checkbox" required /> I agree to the
-          <Link to="/terms-and-conditions"> Terms & Conditions</Link> {/* Link to Terms & Conditions page */}
+          <Link to="/terms-and-conditions"> Terms & Conditions</Link>
         </label>
-        <button type="submit">Sign Up</button>
-        {error && <p>{error}</p>}
+        <button type="submit" disabled={loading}>
+          {loading ? "Signing up..." : "Sign Up"}
+        </button>
       </form>
       <p>
-        Already have an account? <Link to="/login">Login here</Link> {/* Link to switch to the Login page */}
+        Already have an account? <Link to="/login">Login here</Link>
       </p>
     </div>
   );

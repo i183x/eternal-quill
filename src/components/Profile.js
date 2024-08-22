@@ -3,11 +3,11 @@ import { auth, db, storage } from "../firebase";
 import { doc, getDoc, updateDoc, deleteDoc, collection, query, where, getDocs } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { useNavigate, useParams, Link } from "react-router-dom";
-import { onAuthStateChanged } from "firebase/auth";  // Ensure this import is here
+import { onAuthStateChanged } from "firebase/auth";
 import "./styles/Profile.css";
 
 const Profile = () => {
-  const { userId } = useParams(); 
+  const { userId } = useParams();
   const [currentUser, setCurrentUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [introduction, setIntroduction] = useState("");
@@ -20,13 +20,15 @@ const Profile = () => {
   const [followingCount, setFollowingCount] = useState(0);
   const [writeupsCount, setWriteupsCount] = useState(0);
   const [loadingPosts, setLoadingPosts] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [savingProfile, setSavingProfile] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setCurrentUser(user);
-        fetchUserData(userId || user.uid); 
+        fetchUserData(userId || user.uid);
         fetchUserStats(userId || user.uid);
         fetchUserPosts(userId || user.uid);
       } else {
@@ -35,9 +37,10 @@ const Profile = () => {
     });
 
     return () => unsubscribe();
-  }, [userId]);
+  }, [userId, navigate]);
 
   const fetchUserData = async (uid) => {
+    setLoadingProfile(true);
     try {
       const userDoc = await getDoc(doc(db, "users", uid));
       if (userDoc.exists()) {
@@ -48,7 +51,9 @@ const Profile = () => {
         setError("User not found");
       }
     } catch (error) {
-      console.error("Error fetching user data:", error);
+      setError("Error fetching user data: " + error.message);
+    } finally {
+      setLoadingProfile(false);
     }
   };
 
@@ -64,16 +69,14 @@ const Profile = () => {
       const writeupsQuerySnapshot = await getDocs(writeupsQuery);
       setWriteupsCount(writeupsQuerySnapshot.size);
     } catch (error) {
-      console.error("Error fetching user stats:", error);
+      setError("Error fetching user stats: " + error.message);
     }
   };
 
   const fetchUserPosts = async (uid) => {
+    setLoadingPosts(true);
     try {
-      const postsQuery = query(
-        collection(db, "posts"),
-        where("authorId", "==", uid)
-      );
+      const postsQuery = query(collection(db, "posts"), where("authorId", "==", uid));
       const querySnapshot = await getDocs(postsQuery);
       const postsData = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -88,8 +91,11 @@ const Profile = () => {
   };
 
   const handleSaveProfile = async () => {
+    if (savingProfile) return;
+
     const user = currentUser;
     if (user) {
+      setSavingProfile(true);
       try {
         let profilePicUrl = imageUrl;
         if (profilePic) {
@@ -107,6 +113,8 @@ const Profile = () => {
         setError("Profile updated successfully!");
       } catch (error) {
         setError("Error updating profile: " + error.message);
+      } finally {
+        setSavingProfile(false);
       }
     }
   };
@@ -123,10 +131,10 @@ const Profile = () => {
   const handleDeletePost = async (postId) => {
     try {
       await deleteDoc(doc(db, "posts", postId));
-      setUserPosts(userPosts.filter(post => post.id !== postId)); 
-      setWriteupsCount(writeupsCount - 1); 
+      setUserPosts(userPosts.filter(post => post.id !== postId));
+      setWriteupsCount(writeupsCount - 1);
     } catch (error) {
-      console.error("Error deleting post:", error.message);
+      setError("Error deleting post: " + error.message);
     }
   };
 
@@ -135,7 +143,7 @@ const Profile = () => {
       await auth.signOut();
       navigate("/login");
     } catch (error) {
-      console.error("Error logging out:", error);
+      setError("Error logging out: " + error.message);
     }
   };
 
@@ -143,7 +151,9 @@ const Profile = () => {
     <div className="profile-container">
       <h2>{userId ? `${userData?.username}'s Profile` : "Your Profile"}</h2>
       {error && <p className="error">{error}</p>}
-      {userData && (
+      {loadingProfile ? (
+        <p>Loading profile...</p>
+      ) : userData ? (
         <div className="profile-content">
           <div className="profile-image">
             {imageUrl && <img src={imageUrl} alt="Profile" />}
@@ -161,7 +171,9 @@ const Profile = () => {
                       rows="4"
                     />
                     <input type="file" onChange={handleProfilePicChange} />
-                    <button onClick={handleSaveProfile}>Save Profile</button>
+                    <button onClick={handleSaveProfile} disabled={savingProfile}>
+                      {savingProfile ? "Saving..." : "Save Profile"}
+                    </button>
                   </>
                 ) : (
                   <button onClick={() => setIsEditing(true)}>Edit Profile</button>
@@ -199,6 +211,8 @@ const Profile = () => {
             )}
           </div>
         </div>
+      ) : (
+        <p>User not found</p>
       )}
     </div>
   );

@@ -1,0 +1,115 @@
+/* LoginSignup.css */
+
+/* Container */
+.auth-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    text-align: center;
+  }
+  
+  /* Header */
+  .auth-container h2 {
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333333;
+  }
+  
+  /* Input Fields */
+  .auth-container input[type="text"],
+  .auth-container input[type="email"],
+  .auth-container input[type="password"],
+  .auth-container input[type="number"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  
+  .auth-container input[type="text"]:focus,
+  .auth-container input[type="email"]:focus,
+  .auth-container input[type="password"]:focus,
+  .auth-container input[type="number"]:focus {
+    border-color: #888888;
+    outline: none;
+  }
+  
+  /* Button */
+  .auth-container button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    color: #ffffff;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .auth-container button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+  }
+  
+  .auth-container button:focus {
+    outline: none;
+  }
+  
+  /* Error Message */
+  .auth-container .error {
+    margin-bottom: 15px;
+    color: #ff4d4d;
+    font-size: 14px;
+  }
+  
+  /* Links */
+  .auth-container a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .auth-container a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Checkbox */
+  .auth-container label {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #333333;
+  }
+  
+  .auth-container label input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    .auth-container {
+      padding: 15px;
+    }
+  
+    .auth-container h2 {
+      font-size: 20px;
+    }
+  
+    .auth-container input[type="text"],
+    .auth-container input[type="email"],
+    .auth-container input[type="password"],
+    .auth-container input[type="number"] {
+      font-size: 14px;
+    }
+  
+    .auth-container button {
+      font-size: 14px;
+    }
+  }
+  

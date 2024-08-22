@@ -2,15 +2,26 @@ import React, { useState } from "react";
 import { auth, db } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, updateDoc } from "firebase/firestore";
-import { useNavigate, Link } from "react-router-dom"; // Import Link
+import { useNavigate, Link } from "react-router-dom";
+import "./styles/LoginSignup.css"; // Assuming a shared style file for Login and Signup
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!email || !password) {
+      setError("Please fill in all fields.");
+      return;
+    }
+
+    setLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -23,13 +34,16 @@ const Login = () => {
 
       navigate("/"); // Redirect to the Feed/Home page after login
     } catch (error) {
-      console.error("Error logging in:", error.message);
+      setError("Error logging in: " + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div className="auth-container">
       <h2>Login</h2>
+      {error && <p className="error">{error}</p>}
       <form onSubmit={handleLogin}>
         <input
           type="email"
@@ -45,10 +59,12 @@ const Login = () => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
       <p>
-        Don't have an account? <Link to="/signup">Sign up here</Link> {/* Link to switch to the Signup page */}
+        Don't have an account? <Link to="/signup">Sign up here</Link>
       </p>
     </div>
   );
