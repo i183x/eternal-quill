@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "site": "eternalquill",
     "public": "build",
     "ignore": [
       "firebase.json",

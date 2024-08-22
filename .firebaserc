@@ -1,5 +1,9 @@
 {
   "projects": {
-    "default": "eternal-quill-89b0b"
-  }
+    "default": "eternal-quill-89b0b",
+    "production": "eternal-quill-89b0b"
+  },
+  "targets": {},
+  "etags": {},
+  "dataconnectEmulatorConfig": {}
 }
