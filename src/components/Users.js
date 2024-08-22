@@ -43,7 +43,12 @@ const Users = () => {
         <ul className="user-list">
           {users.map((user) => (
             <li key={user.id}>
-              <Link to={`/profile/${user.id}`}>
+              <Link to={`/profile/${user.id}`} className="user-link">
+                <img 
+                  src={user.profilePicUrl} 
+                  alt={`${user.username}'s profile`} 
+                  className="user-profile-pic"
+                />
                 <span>{user.username}</span>
               </Link>
               {currentUser && currentUser.uid !== user.id && (
