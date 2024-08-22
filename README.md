@@ -114,5 +114,3 @@ The project is licensed under a Contributor License Agreement (CLA). This agreem
 If you have any questions or need further assistance, please feel free to contact us at [purwarkevin@gmail.com].
 
 ---
-
-By following this README, contributors will have a clear understanding of the project, how to set it up, and how they can contribute while maintaining your ownership of the project. This README also provides a professional overview for anyone visiting the repository.
