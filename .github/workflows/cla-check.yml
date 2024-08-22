@@ -1,0 +1,19 @@
+name: CLA Check
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  cla:
+    runs-on: ubuntu-latest
+    steps:
+      - name: CLA Assistant Check
+        uses: cla-assistant/github-action@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          cla-url: https://github.com/i183x/eternal-quill/blob/main/CLA.md
+          label: cla-signed
+          status: pending
+          failure-label: cla-missing
